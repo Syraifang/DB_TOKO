@@ -2,7 +2,6 @@ CREATE DATABASE `db_toko`;
 USE db_toko;
 DROP DATABASE `db_toko`;
 
-
 CREATE TABLE role (
    idrole INT AUTO_INCREMENT PRIMARY KEY,
    nama_role VARCHAR(100)
@@ -188,10 +187,8 @@ SELECT
    u.iduser,
    u.username,
    r.nama_role
-FROM 
-   user u
-JOIN 
-   role r ON u.idrole = r.idrole;
+FROM user u
+JOIN role r ON u.idrole = r.idrole;
    
 CREATE OR REPLACE VIEW v_daftar_barang AS
 SELECT 
@@ -199,25 +196,20 @@ SELECT
    b.nama_barang,
    b.harga,
    s.nama_satuan,
-   b.status,
    b.jenis
-FROM 
-   barang b
-JOIN 
-   satuan s ON b.idsatuan = s.idsatuan
-WHERE b.`status`= 1;
-   
-CREATE VIEW v_stok_barang_terkini AS
+FROM barang b
+JOIN satuan s ON b.idsatuan = s.idsatuan
+WHERE b.status= 1;
+
+CREATE OR REPLACE VIEW v_stok_barang_terkini AS
 SELECT 
    b.idbarang,
    b.nama_barang,
-   (SELECT ks.stok 
+   IFNULL((SELECT ks.stok 
    FROM kartu_stok ks 
    WHERE ks.idbarang = b.idbarang 
-   ORDER BY ks.idkartu_stok DESC 
-   LIMIT 1) AS stok_terkini
-FROM 
-   barang b;
+   ORDER BY ks.idkartu_stok DESC LIMIT 1), 0) AS stok_terkini
+FROM barang b;
    
 CREATE OR REPLACE VIEW v_laporan_pengadaan_detail AS
 SELECT 
@@ -229,16 +221,11 @@ SELECT
    dp.harga_satuan,
    dp.jumlah,
    dp.sub_total
-FROM 
-   pengadaan p
-JOIN 
-   detail_pengadaan dp ON p.idpengadaan = dp.idpengadaan
-JOIN 
-   barang b ON dp.idbarang = b.idbarang
-JOIN 
-   user u ON p.user_iduser = u.iduser
-JOIN 
-   vendor v ON p.vendor_idvendor = v.idvendor;
+FROM pengadaan p
+JOIN detail_pengadaan dp ON p.idpengadaan = dp.idpengadaan
+JOIN barang b ON dp.idbarang = b.idbarang
+JOIN user u ON p.user_iduser = u.iduser
+JOIN vendor v ON p.vendor_idvendor = v.idvendor;
    
 CREATE OR REPLACE VIEW v_laporan_penerimaan_detail AS
 SELECT 
@@ -250,14 +237,10 @@ SELECT
    dp.jumlah_terima,
    dp.harga_satuan_terima,
    dp.sub_total_terima
-FROM 
-   penerimaan p
-JOIN 
-   detail_penerimaan dp ON p.idpenerimaan = dp.idpenerimaan
-JOIN 
-   barang b ON dp.barang_idbarang = b.idbarang
-JOIN 
-   user u ON p.iduser = u.iduser;
+FROM penerimaan p
+JOIN detail_penerimaan dp ON p.idpenerimaan = dp.idpenerimaan
+JOIN barang b ON dp.barang_idbarang = b.idbarang
+JOIN user u ON p.iduser = u.iduser;
    
 CREATE OR REPLACE VIEW v_laporan_penjualan_detail AS
 SELECT 
@@ -268,11 +251,222 @@ SELECT
    dp.harga_satuan,
    dp.jumlah,
    dp.subtotal
-FROM 
-   penjualan p
-JOIN 
-   detail_penjualan dp ON p.idpenjualan = dp.penjualan_idpenjualan
-JOIN 
-   barang b ON dp.idbarang = b.idbarang
-JOIN 
-   user u ON p.iduser = u.iduser;
+FROM penjualan p
+JOIN detail_penjualan dp ON p.idpenjualan = dp.penjualan_idpenjualan
+JOIN barang b ON dp.idbarang = b.idbarang
+JOIN user u ON p.iduser = u.iduser;
+
+CREATE OR REPLACE VIEW v_vendor_aktif AS
+SELECT 
+   idvendor,
+   nama_vendor,
+   badan_hukum
+FROM vendor
+WHERE status = 'A';
+
+CREATE OR REPLACE VIEW v_satuan_aktif AS
+SELECT 
+   idsatuan,
+   nama_satuan
+FROM satuan
+WHERE status = 1;
+
+CREATE OR REPLACE VIEW v_margin_aktif AS
+SELECT 
+   idmargin_penjualan,
+   persen,
+   iduser
+FROM margin_penjualan
+WHERE status = 1;
+
+CREATE OR REPLACE VIEW v_barang_tidak_aktif AS
+SELECT 
+   b.idbarang,
+   b.nama_barang,
+   b.harga,
+   s.nama_satuan,
+   b.jenis
+FROM barang b
+JOIN satuan s ON b.idsatuan = s.idsatuan
+WHERE b.status = 0;
+   
+-- Procedure
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_hapus_barang_logis(IN p_idbarang INT)
+BEGIN
+UPDATE barang
+SET status = 0
+WHERE idbarang = p_idbarang;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_update_kartu_stok(
+   IN p_idbarang INT,
+   IN p_masuk INT,
+   IN p_keluar INT,
+   IN p_jenis_transaksi CHAR(1))
+BEGIN
+   DECLARE v_stok_terakhir INT DEFAULT 0;
+   DECLARE v_stok_baru INT DEFAULT 0;
+   SET v_stok_terakhir = f_get_stok_terkini(p_idbarang);
+   SET v_stok_baru = v_stok_terakhir + p_masuk - p_keluar;
+   INSERT INTO kartu_stok (idbarang, jenis_transaksi, masuk, keluar, stok)
+   VALUES (p_idbarang, p_jenis_transaksi, p_masuk, p_keluar, v_stok_baru);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_cari_barang(
+   IN p_nama_barang VARCHAR(45))
+BEGIN
+   SELECT 
+   b.idbarang,
+   b.nama_barang,
+   b.harga,
+   s.nama_satuan,
+   b.status
+FROM barang b
+JOIN satuan s ON b.idsatuan = s.idsatuan
+WHERE 
+   b.nama_barang LIKE CONCAT('%', p_nama_barang, '%');
+END$$
+
+DELIMITER ;
+
+CALL sp_cari_barang('pul');
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_cari_vendor(
+   IN p_nama_vendor VARCHAR(100))
+BEGIN
+   SELECT 
+   idvendor,
+   nama_vendor,
+   badan_hukum,
+   status
+FROM vendor
+WHERE nama_vendor LIKE CONCAT('%', p_nama_vendor, '%');
+END$$
+
+DELIMITER ;
+
+-- Function
+
+DELIMITER $$
+
+CREATE FUNCTION f_hitung_harga_jual(
+   p_idbarang INT,
+   p_idmargin INT)
+RETURNS DOUBLE
+READS SQL DATA
+BEGIN
+   DECLARE v_harga_dasar INT;
+   DECLARE v_persen_margin DOUBLE;
+   DECLARE v_harga_jual DOUBLE;
+
+SELECT harga INTO v_harga_dasar 
+FROM barang 
+WHERE idbarang = p_idbarang;
+
+SELECT persen INTO v_persen_margin 
+FROM margin_penjualan 
+WHERE idmargin_penjualan = p_idmargin;
+SET v_harga_jual = v_harga_dasar + (v_harga_dasar * (v_persen_margin / 100));
+RETURN v_harga_jual;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE FUNCTION f_get_stok_terkini(
+   p_idbarang INT) 
+RETURNS INT
+READS SQL DATA
+BEGIN
+   DECLARE v_stok INT DEFAULT 0;
+
+SELECT stok INTO v_stok 
+FROM kartu_stok 
+WHERE idbarang = p_idbarang
+ORDER BY idkartu_stok DESC 
+   LIMIT 1;
+RETURN v_stok;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE FUNCTION f_hitung_subtotal(
+   p_idbarang INT,
+   p_idmargin INT,
+   p_jumlah INT) 
+RETURNS DOUBLE
+READS SQL DATA
+BEGIN
+   DECLARE v_harga_jual_satuan DOUBLE;
+   DECLARE v_subtotal_final DOUBLE;
+
+SET v_harga_jual_satuan = f_hitung_harga_jual(p_idbarang, p_idmargin);
+-- menghitung harga
+SET v_subtotal_final = v_harga_jual_satuan * p_jumlah;
+RETURN v_subtotal_final;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE FUNCTION f_hitung_total_nilai(
+   p_subtotal INT)
+RETURNS DOUBLE
+DETERMINISTIC
+BEGIN
+   DECLARE v_ppn DOUBLE;
+   DECLARE v_total_nilai DOUBLE;
+    
+SET v_ppn = p_subtotal * 0.10; 
+SET v_total_nilai = p_subtotal + v_ppn;
+RETURN v_total_nilai;
+END$$
+
+DELIMITER ;
+
+-- triger
+
+DELIMITER $$
+
+CREATE TRIGGER trg_detail_penjualan AFTER INSERT ON detail_penjualan
+FOR EACH ROW
+BEGIN
+CALL sp_update_kartu_stok(
+   NEW.idbarang,
+   0,
+   NEW.jumlah,
+	'K');
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_detail_penerimaan AFTER INSERT ON detail_penerimaan
+FOR EACH ROW
+BEGIN
+CALL sp_update_kartu_stok(
+   NEW.barang_idbarang,
+   NEW.jumlah_terima,
+   0,
+   'M');
+END$$
+
+DELIMITER ;
