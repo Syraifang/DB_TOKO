@@ -4,8 +4,7 @@ DROP DATABASE `db_toko`;
 
 CREATE TABLE role (
    idrole INT AUTO_INCREMENT PRIMARY KEY,
-   nama_role VARCHAR(100)
-);
+   nama_role VARCHAR(100));
 
 INSERT INTO role (nama_role) VALUES
 ('Administrator'),
@@ -15,8 +14,7 @@ INSERT INTO role (nama_role) VALUES
 CREATE TABLE satuan (
    idsatuan INT AUTO_INCREMENT PRIMARY KEY,
    nama_satuan VARCHAR(45),
-   status TINYINT(1)
-);
+   status TINYINT(1));
 
 INSERT INTO satuan (idsatuan, nama_satuan, status) VALUES
 (101,'Pcs', 1),
@@ -29,8 +27,7 @@ CREATE TABLE vendor (
    idvendor INT AUTO_INCREMENT PRIMARY KEY,
    nama_vendor VARCHAR(100) ,
    badan_hukum CHAR(1), 
-   status CHAR(1) 
-);
+   status CHAR(1) );
 
 INSERT INTO vendor (nama_vendor, badan_hukum, status) VALUES
 ('PT Sinar Jaya Abadi', 'P', 'T'),
@@ -44,16 +41,14 @@ CREATE TABLE margin_penjualan (
    status TINYINT(1), 
    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   iduser INT NOT NULL
-);
+   iduser INT NOT NULL);
 
 CREATE TABLE user (
    iduser INT AUTO_INCREMENT PRIMARY KEY,
    username VARCHAR(45),
    password VARCHAR(100),
    idrole INT NOT NULL,
-   FOREIGN KEY (idrole) REFERENCES role(idrole)
-);
+   FOREIGN KEY (idrole) REFERENCES role(idrole));
 
 INSERT INTO user (iduser, username, password, idrole) VALUES
 (77,'admin', 'admin123', 1),
@@ -72,14 +67,19 @@ CREATE TABLE barang (
    harga INT,
    status TINYINT(1),
    idsatuan INT NOT NULL,
-   FOREIGN KEY (idsatuan) REFERENCES satuan(idsatuan)
-);
+   FOREIGN KEY (idsatuan) REFERENCES satuan(idsatuan));
 
-INSERT INTO barang (idbarang, jenis, nama_barang, harga, status, idsatuan) VALUES
-(51,'B', 'Penggaris Kayu', 20000, 0, 101),
-(52,'B', 'Pulpen Copilot', 15000, 1, 101),
-(53,'B', 'Spidol Whiteboard Snowman', 100000, 0, 103),
-(54,'B', 'Kertas A4', 55000, 1, 102);
+INSERT INTO barang (jenis, nama_barang, harga, status, idsatuan) VALUES
+('B', 'Penggaris Kayu', 20000, 0, 101),
+('B', 'Pulpen Copilot', 15000, 1, 101),
+('B', 'Spidol Whiteboard Snowman', 100000, 0, 103),
+('B', 'Kertas A4', 55000, 1, 102),
+('B', 'Rider Belt', 50000, 0, 101),
+('B', 'Kuuga Mask', 40000, 0, 101),
+('B', 'Decade Belt', 100000, 0, 101),
+('M', 'Garam Doa', 30000, 1, 104),
+('M', 'Sarimi isi 5', 200000, 0, 102),
+('B', 'Kelereng W', 12000, 1, 103);
 
 CREATE TABLE kartu_stok (
    idkartu_stok INT AUTO_INCREMENT PRIMARY KEY,
@@ -89,8 +89,7 @@ CREATE TABLE kartu_stok (
    stok INT,
    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    idbarang INT NOT NULL,
-   FOREIGN KEY (idbarang) REFERENCES barang(idbarang)
-);
+   FOREIGN KEY (idbarang) REFERENCES barang(idbarang));
 
 CREATE TABLE pengadaan (
    idpengadaan INT AUTO_INCREMENT PRIMARY KEY,
@@ -102,8 +101,7 @@ CREATE TABLE pengadaan (
    user_iduser INT NOT NULL,
    vendor_idvendor INT NOT NULL,
    FOREIGN KEY (user_iduser) REFERENCES user(iduser),
-   FOREIGN KEY (vendor_idvendor) REFERENCES vendor(idvendor)
-);
+   FOREIGN KEY (vendor_idvendor) REFERENCES vendor(idvendor));
 
 
 CREATE TABLE penerimaan (
@@ -113,8 +111,7 @@ CREATE TABLE penerimaan (
    idpengadaan INT NOT NULL,
    iduser INT NOT NULL,
    FOREIGN KEY (idpengadaan) REFERENCES pengadaan(idpengadaan),
-   FOREIGN KEY (iduser) REFERENCES user(iduser)
-);
+   FOREIGN KEY (iduser) REFERENCES user(iduser));
 
 CREATE TABLE penjualan (
    idpenjualan INT AUTO_INCREMENT PRIMARY KEY,
@@ -125,8 +122,7 @@ CREATE TABLE penjualan (
    iduser INT NOT NULL,
    idmargin_penjualan INT NOT NULL,
    FOREIGN KEY (iduser) REFERENCES user(iduser),
-   FOREIGN KEY (idmargin_penjualan) REFERENCES margin_penjualan(idmargin_penjualan)
-);
+   FOREIGN KEY (idmargin_penjualan) REFERENCES margin_penjualan(idmargin_penjualan));
 
 CREATE TABLE retur (
    idretur INT AUTO_INCREMENT PRIMARY KEY,
@@ -134,8 +130,7 @@ CREATE TABLE retur (
    idpenerimaan INT NOT null,
    iduser INT NOT null,
    FOREIGN KEY (idpenerimaan) REFERENCES penerimaan(idpenerimaan),
-   FOREIGN KEY (iduser) REFERENCES user(iduser)
-);
+   FOREIGN KEY (iduser) REFERENCES user(iduser));
 
 CREATE TABLE detail_pengadaan (
    iddetail_pengadaan INT AUTO_INCREMENT PRIMARY KEY,
@@ -145,8 +140,7 @@ CREATE TABLE detail_pengadaan (
    idbarang INT NOT NULL,
    idpengadaan INT NOT NULL,
    FOREIGN KEY (idbarang) REFERENCES barang(idbarang),
-   FOREIGN KEY (idpengadaan) REFERENCES pengadaan(idpengadaan)
-);
+   FOREIGN KEY (idpengadaan) REFERENCES pengadaan(idpengadaan));
 
 CREATE TABLE detail_penerimaan (
    iddetail_penerimaan INT AUTO_INCREMENT PRIMARY KEY,
@@ -156,8 +150,7 @@ CREATE TABLE detail_penerimaan (
    harga_satuan_terima INT,
    sub_total_terima INT ,
    FOREIGN KEY (barang_idbarang) REFERENCES barang(idbarang),
-   FOREIGN KEY (idpenerimaan) REFERENCES penerimaan(idpenerimaan)
-);
+   FOREIGN KEY (idpenerimaan) REFERENCES penerimaan(idpenerimaan));
 
 CREATE TABLE detail_penjualan (
    iddetail_penjualan INT AUTO_INCREMENT PRIMARY KEY,
@@ -167,8 +160,7 @@ CREATE TABLE detail_penjualan (
    idbarang INT NOT NULL,
    penjualan_idpenjualan INT NOT NULL,
    FOREIGN KEY (idbarang) REFERENCES barang(idbarang),
-   FOREIGN KEY (penjualan_idpenjualan) REFERENCES penjualan(idpenjualan)
-);
+   FOREIGN KEY (penjualan_idpenjualan) REFERENCES penjualan(idpenjualan));
 
 CREATE TABLE detail_retur (
    iddetail_retur INT AUTO_INCREMENT PRIMARY KEY,
@@ -177,8 +169,7 @@ CREATE TABLE detail_retur (
    idretur INT NOT NULL,
    iddetail_penerimaan INT NOT NULL,
    FOREIGN KEY (idretur) REFERENCES retur(idretur),
-   FOREIGN KEY (iddetail_penerimaan) REFERENCES detail_penerimaan(iddetail_penerimaan)
-);
+   FOREIGN KEY (iddetail_penerimaan) REFERENCES detail_penerimaan(iddetail_penerimaan));
 
 -- VIEW
 
