@@ -74,6 +74,7 @@ INSERT INTO barang (jenis, nama_barang, harga, status, idsatuan) VALUES
 ('B', 'Pulpen Copilot', 15000, 1, 101),
 ('B', 'Spidol Whiteboard Snowman', 100000, 0, 103),
 ('B', 'Kertas A4', 55000, 1, 102),
+-- 77 ke 82 --
 ('B', 'Rider Belt', 50000, 0, 101),
 ('B', 'Kuuga Mask', 40000, 0, 101),
 ('B', 'Decade Belt', 100000, 0, 101),
