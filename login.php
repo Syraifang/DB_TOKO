@@ -1,5 +1,4 @@
 <?php
-// Mulai session untuk menangani pesan error
 session_start();
 ?>
 <!DOCTYPE html>
@@ -14,7 +13,6 @@ session_start();
             justify-content: center; 
             align-items: center; 
             height: 100vh; 
-            /* PERUBAHAN: Warna latar belakang disamakan dengan index.php */
             background-color: #86c3ecff; 
             margin: 0;
         }
@@ -48,7 +46,6 @@ session_start();
         .login-button {
             width: 100%;
             padding: 12px;
-            /* PERUBAHAN: Warna tombol disamakan dengan index.php */
             background-color: #007bff;
             color: white;
             border: none;
@@ -58,7 +55,6 @@ session_start();
             cursor: pointer;
         }
         .login-button:hover {
-            /* PERUBAHAN: Warna hover disamakan dengan index.php */
             background-color: #0056b3;
         }
         .error-message {
@@ -70,7 +66,6 @@ session_start();
             text-align: center;
             margin-bottom: 20px;
         }
-        /* BARU: Style untuk link registrasi */
         .register-link {
             text-align: center;
             margin-top: 20px;
@@ -82,9 +77,6 @@ session_start();
             text-decoration: none;
             font-weight: bold;
         }
-        .register-link a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -92,13 +84,12 @@ session_start();
         <h2>Login Akun</h2>
 
         <?php
-        // Cek apakah ada pesan error dari proses_login.php
         if (isset($_SESSION['error_message'])):
         ?>
             <div class="error-message">
                 <?php 
                 echo $_SESSION['error_message']; 
-                unset($_SESSION['error_message']); // Hapus pesan error setelah ditampilkan
+                unset($_SESSION['error_message']); 
                 ?>
             </div>
         <?php endif; ?>
@@ -106,17 +97,17 @@ session_start();
         <form action="proses_login.php" method="POST">
             <div class="input-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" required placeholder="Masukkan username">
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" required placeholder="Masukkan password">
             </div>
             <button type="submit" class="login-button">Login</button>
         </form>
 
         <div class="register-link">
-            Belum punya akun? <a href="register.php">Daftar di sini</a>
+            Belum punya akun? <a href="register.php">Daftar disini</a>
         </div>
     </div>
 </body>
