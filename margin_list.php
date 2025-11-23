@@ -43,7 +43,7 @@ $data_margin = $respon->data;
     <div class="container">
         <h1>💰 Manajemen Margin Keuntungan</h1>
         <a href="dashboard.php" class="btn btn-back">Kembali</a>
-        <a href="margin_form.php" class="btn btn-add">+ Atur Margin Baru</a>
+        <a href="margin_form.php" class="btn btn-add">Atur Margin Baru</a>
 
         <table>
             <thead>

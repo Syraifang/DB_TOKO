@@ -462,3 +462,21 @@ CALL sp_update_kartu_stok(
 END$$
 
 DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_after_insert_detail_retur AFTER INSERT ON detail_retur FOR EACH ROW
+BEGIN DECLARE v_idbarang INT;
+
+SELECT barang_idbarang INTO v_idbarang
+FROM detail_penerimaan
+WHERE iddetail_penerimaan = NEW.iddetail_penerimaan;
+
+CALL sp_update_kartu_stok(
+   v_idbarang, 
+   0, 
+   NEW.jumlah, 
+   'K');
+END$$
+
+DELIMITER ;

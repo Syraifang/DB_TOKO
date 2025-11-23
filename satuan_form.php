@@ -9,7 +9,6 @@ $idsatuan = "";
 $nama_satuan = "";
 $is_edit = false;
 
-// Cek Mode Edit
 if (isset($_GET['id'])) {
     $is_edit = true;
     $idsatuan = $_GET['id'];

@@ -50,12 +50,12 @@ $list_role = $res_role->data;
             <input type="hidden" name="iduser" value="<?php echo $iduser; ?>">
 
             <label>Username</label>
-            <input type="text" name="username" value="<?php echo $username; ?>" required>
+            <input type="text" name="username" value="<?php echo $username; ?>" required placeholder="Masukkan username">
 
             <label>Password</label>
             <input type="text" name="password" value="<?php echo $password; ?>" required placeholder="Masukkan password">
 
-            <label>Jabatan (Role)</label>
+            <label>Role</label>
             <select name="idrole">
                 <?php foreach($list_role as $role): ?>
                     <option value="<?php echo $role['idrole']; ?>" 

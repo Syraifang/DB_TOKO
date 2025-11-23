@@ -2,7 +2,6 @@
 session_start();
 require_once 'koneksi.php';
 
-// Cek Login & Role (Hanya Admin)
 if (!isset($_SESSION['is_logged_in']) || $_SESSION['idrole'] != 1) {
     header("Location: login.php");
     exit;
@@ -10,8 +9,6 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['idrole'] != 1) {
 
 $db = new DbConnection();
 
-// Query: Ambil SEMUA barang (Aktif & Mati) beserta nama satuannya
-// Kita pakai Raw SQL + JOIN manual agar bisa lihat status 0
 $query = "SELECT b.*, s.nama_satuan 
           FROM barang b 
           JOIN satuan s ON b.idsatuan = s.idsatuan 

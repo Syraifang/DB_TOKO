@@ -5,20 +5,18 @@ if ($_SESSION['idrole'] != 1) exit("Akses Ditolak");
 
 $db = new DbConnection();
 
-$idmargin = "";
-$persen = "";
+$idrole = "";
+$nama_role = "";
 $is_edit = false;
 
 if (isset($_GET['id'])) {
     $is_edit = true;
-    $idmargin = $_GET['id'];
-    
-    $q = "SELECT * FROM margin_penjualan WHERE idmargin_penjualan = ?";
-    $res = $db->send_secure_query($q, [$idmargin], 'i');
-    
+    $idrole = $_GET['id'];
+    $q = "SELECT * FROM role WHERE idrole = ?";
+    $res = $db->send_secure_query($q, [$idrole], 'i');
     if ($res->sukses && count($res->data) > 0) {
         $data = $res->data[0];
-        $persen = $data['persen'];
+        $nama_role = $data['nama_role'];
     }
 }
 ?>
@@ -26,7 +24,7 @@ if (isset($_GET['id'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Form Margin</title>
+    <title>Form Role</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f7f6; padding: 20px; display: flex; justify-content: center; }
         .box { background: white; padding: 30px; width: 400px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -36,19 +34,19 @@ if (isset($_GET['id'])) {
 </head>
 <body>
     <div class="box">
-        <h2><?php echo $is_edit ? "Edit Margin" : "Tambah Margin Baru"; ?></h2>
+        <h2><?php echo $is_edit ? "Edit Role" : "Tambah Role Baru"; ?></h2>
         
-        <form action="margin_proses.php" method="POST">
+        <form action="role_proses.php" method="POST">
             <input type="hidden" name="aksi" value="<?php echo $is_edit ? 'update' : 'create'; ?>">
-            <input type="hidden" name="idmargin_penjualan" value="<?php echo $idmargin; ?>">
+            <input type="hidden" name="idrole" value="<?php echo $idrole; ?>">
 
-            <label>Persentase Keuntungan (%)</label>
-            <input type="number" step="0.1" name="persen" value="<?php echo $persen; ?>">
+            <label>Nama Role</label>
+            <input type="text" name="nama_role" value="<?php echo $nama_role; ?>">
 
             <button type="submit">Simpan Data</button>
         </form>
         <br>
-        <a href="margin_list.php">Batal</a>
+        <a href="role_list.php">Batal</a>
     </div>
 </body>
 </html>

@@ -10,7 +10,6 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['idrole'] != 1) {
 
 $db = new DbConnection();
 
-// Query: Ambil SEMUA satuan
 $query = "SELECT * FROM satuan ORDER BY idsatuan DESC";
 $respon = $db->send_query($query);
 $data_satuan = $respon->data;

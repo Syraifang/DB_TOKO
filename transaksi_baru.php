@@ -2,7 +2,6 @@
 session_start();
 require_once 'koneksi.php';
 
-// Cek Login (Admin & Kasir boleh masuk)
 if (!isset($_SESSION['is_logged_in']) || !in_array($_SESSION['idrole'], [1, 2])) {
     header("Location: login.php");
     exit;
@@ -10,36 +9,29 @@ if (!isset($_SESSION['is_logged_in']) || !in_array($_SESSION['idrole'], [1, 2]))
 
 $db = new DbConnection();
 
-// --- 1. LOGIKA KERANJANG BELANJA (SESSION) ---
-
-// Jika belum ada keranjang, buat array kosong
 if (!isset($_SESSION['keranjang'])) {
     $_SESSION['keranjang'] = [];
 }
 
-// Tambah Barang ke Keranjang
 if (isset($_POST['aksi']) && $_POST['aksi'] == 'tambah') {
     $idbarang = $_POST['idbarang'];
     $jumlah = $_POST['jumlah'];
 
-    // Ambil Detail Barang dari Database (untuk nama & harga)
-    // Kita pakai VIEW v_daftar_barang agar sesuai harga & status
+
     $q = "SELECT * FROM v_daftar_barang WHERE idbarang = ?";
     $res = $db->send_secure_query($q, [$idbarang], 'i');
 
     if ($res->sukses && count($res->data) > 0) {
         $barang = $res->data[0];
-        
-        // Masukkan ke session array
+      
         $item = [
             'id' => $barang['idbarang'],
             'nama' => $barang['nama_barang'],
-            'harga' => $barang['harga'], // Ini harga modal/dasar
+            'harga' => $barang['harga'], 
             'satuan' => $barang['nama_satuan'],
             'jumlah' => $jumlah
         ];
         
-        // Cek apakah barang sudah ada di keranjang? Kalau ada, tambahkan jumlahnya
         $found = false;
         foreach ($_SESSION['keranjang'] as $key => $val) {
             if ($val['id'] == $idbarang) {
@@ -55,29 +47,27 @@ if (isset($_POST['aksi']) && $_POST['aksi'] == 'tambah') {
     }
 }
 
-// Hapus Barang dari Keranjang
 if (isset($_GET['hapus'])) {
     $index = $_GET['hapus'];
     unset($_SESSION['keranjang'][$index]);
-    // Reset urutan array
+
     $_SESSION['keranjang'] = array_values($_SESSION['keranjang']);
 }
 
-// Reset Keranjang (Batal)
 if (isset($_GET['reset'])) {
     unset($_SESSION['keranjang']);
     header("Location: transaksi_baru.php");
     exit;
 }
 
-// --- 2. AMBIL DATA PENDUKUNG ---
 
-// Ambil Daftar Barang Aktif untuk Dropdown
-$q_barang = "SELECT * FROM v_daftar_barang ORDER BY nama_barang ASC";
+$q_barang ="SELECT b.*, s.stok_terkini 
+            FROM v_daftar_barang b
+            JOIN v_stok_barang_terkini s ON b.idbarang = s.idbarang
+            ORDER BY b.nama_barang ASC";
 $res_barang = $db->send_query($q_barang);
 $list_barang = $res_barang->data;
 
-// Ambil Margin Aktif (Kita ambil margin aktif terakhir yang dibuat)
 $q_margin = "SELECT * FROM margin_penjualan WHERE status = 1 ORDER BY idmargin_penjualan DESC LIMIT 1";
 $res_margin = $db->send_query($q_margin);
 $margin_aktif = null;
@@ -111,8 +101,8 @@ if ($res_margin->sukses && count($res_margin->data) > 0) {
 </head>
 <body>
 
-    <h1>🛒 Kasir (Point of Sales)</h1>
-    <a href="dashboard.php" style="text-decoration: none;">&larr; Kembali ke Dashboard</a>
+    <h1>🛒 Pembelian</h1>
+    <a href="dashboard.php" style="text-decoration: none;">Kembali ke Dashboard</a>
     <br><br>
 
     <div class="container">
@@ -133,7 +123,7 @@ if ($res_margin->sukses && count($res_margin->data) > 0) {
                         <option value="">-- Cari Barang --</option>
                         <?php foreach($list_barang as $b): ?>
                             <option value="<?php echo $b['idbarang']; ?>">
-                                <?php echo $b['nama_barang']; ?> (Stok: ?) - Rp <?php echo number_format($b['harga']); ?>
+                                <?php echo $b['nama_barang']; ?> (Stok: <?php echo $b['stok_terkini']; ?>) - Rp <?php echo number_format($b['harga']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -172,14 +162,10 @@ if ($res_margin->sukses && count($res_margin->data) > 0) {
                     
                     if (!empty($_SESSION['keranjang'])):
                         foreach($_SESSION['keranjang'] as $key => $item): 
-                            // HITUNG HARGA JUAL & SUBTOTAL DI SINI (Memakai Logika Function)
                             
-                            // 1. Hitung Harga Jual (Modal + Margin)
-                            // Rumus: Harga + (Harga * Persen / 100)
                             $persen = $margin_aktif['persen'];
                             $harga_jual = $item['harga'] + ($item['harga'] * $persen / 100);
                             
-                            // 2. Hitung Subtotal
                             $subtotal = $harga_jual * $item['jumlah'];
                             
                             $grand_total += $subtotal;
@@ -203,7 +189,7 @@ if ($res_margin->sukses && count($res_margin->data) > 0) {
                 <?php if($grand_total > 0): ?>
                 <tfoot>
                     <?php 
-                        $ppn = $grand_total * 0.11; // PPN 11%
+                        $ppn = $grand_total * 0.10;
                         $total_bayar = $grand_total + $ppn;
                     ?>
                     <tr>
@@ -211,7 +197,7 @@ if ($res_margin->sukses && count($res_margin->data) > 0) {
                         <td colspan="2">Rp <?php echo number_format($grand_total, 0, ',', '.'); ?></td>
                     </tr>
                     <tr>
-                        <td colspan="4" style="text-align: right;">PPN (11%)</td>
+                        <td colspan="4" style="text-align: right;">PPN (10%)</td>
                         <td colspan="2">Rp <?php echo number_format($ppn, 0, ',', '.'); ?></td>
                     </tr>
                     <tr class="total-row">
