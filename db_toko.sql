@@ -178,9 +178,18 @@ CREATE OR REPLACE VIEW v_daftar_user AS
 SELECT 
    u.iduser,
    u.username,
-   r.nama_role
+   r.nama_role,
+   u.password
 FROM user u
 JOIN role r ON u.idrole = r.idrole;
+
+-- Baru --
+
+CREATE OR REPLACE VIEW v_daftar_role AS
+SELECT
+	r.idrole,
+	r.nama_role
+FROM role r;
    
 CREATE OR REPLACE VIEW v_daftar_barang AS
 SELECT 
@@ -192,6 +201,18 @@ SELECT
 FROM barang b
 JOIN satuan s ON b.idsatuan = s.idsatuan
 WHERE b.status= 1;
+
+-- baru -- 
+CREATE OR REPLACE VIEW v_barang AS
+SELECT 
+   b.idbarang,
+   b.nama_barang,
+   b.harga,
+   s.nama_satuan,
+   b.jenis,
+   b.status
+FROM barang b
+JOIN satuan s ON b.idsatuan = s.idsatuan;
 
 CREATE OR REPLACE VIEW v_stok_barang_terkini AS
 SELECT 
@@ -281,6 +302,20 @@ SELECT
 FROM barang b
 JOIN satuan s ON b.idsatuan = s.idsatuan
 WHERE b.status = 0;
+
+-- Baru 
+
+CREATE OR REPLACE VIEW v_kartu_stok_lengkap AS
+SELECT 
+   k.idkartu_stok,
+   k.created_at AS tanggal,
+   b.nama_barang,
+   k.jenis_transaksi,
+   k.masuk,
+   k.keluar,
+   k.stok AS sisa_stok
+FROM kartu_stok k
+JOIN barang b ON k.idbarang = b.idbarang;
    
 -- Procedure
 

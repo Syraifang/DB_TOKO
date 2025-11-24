@@ -52,6 +52,8 @@ $data_retur = $respon->data;
                     <th>Staff</th>
                     <th>Info</th>
                 </tr>
+                </thead>
+            <tbody>
                 <?php foreach($data_retur as $row): ?>
                 <tr>
                     <td>#RET-<?php echo $row['idretur']; ?></td>
@@ -65,24 +67,10 @@ $data_retur = $respon->data;
                     
                     <td>
                         <a href="retur_detail.php?id=<?php echo $row['idretur']; ?>" 
-                        style="background-color: #17a2b8; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 12px;">
-                        Lihat Detail
+                           style="background-color: #17a2b8; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 12px;">
+                           Lihat Detail
                         </a>
                     </td>
-                </tr>
-                <?php endforeach; ?>
-            </thead>
-            <tbody>
-                <?php foreach($data_retur as $row): ?>
-                <tr>
-                    <td>#RET-<?php echo $row['idretur']; ?></td>
-                    <td><?php echo $row['created_at']; ?></td>
-                    <td>
-                        #RCV-<?php echo $row['idpenerimaan']; ?> <br>
-                        <small>(Tgl Terima: <?php echo $row['tgl_terima']; ?>)</small>
-                    </td>
-                    <td><?php echo htmlspecialchars($row['nama_vendor']); ?></td>
-                    <td><?php echo htmlspecialchars($row['username']); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

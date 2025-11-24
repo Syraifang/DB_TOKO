@@ -22,13 +22,13 @@ if ($idrole == 1) {
         $total_penjualan = $resp_jual->data[0]['total'];
     }
 
-    $q_stok = "SELECT IFNULL(SUM(stok_terkini), 0) AS total FROM v_stok_barang_terkini";
+    $q_stok = "SELECT IFNULL(SUM(stok_terkini), 0) AS total FROM v_stok_barang_terkini"; // view 6
     $resp_stok = $db->send_query($q_stok);
     if ($resp_stok->sukses && count($resp_stok->data) > 0) {
         $barang_habis = $resp_stok->data[0]['total'];
     }
 
-    $q_vendor = "SELECT COUNT(*) AS total FROM v_vendor_aktif";
+    $q_vendor = "SELECT COUNT(*) AS total FROM v_vendor_aktif"; // view 5
     $resp_vendor = $db->send_query($q_vendor);
     if ($resp_vendor->sukses && count($resp_vendor->data) > 0) {
         $vendor_aktif = $resp_vendor->data[0]['total'];
@@ -132,7 +132,7 @@ $db->close_connection();
                     <li><a href="role_list.php">🔑 Manajemen Role</a></li>
 
                     <div class="menu-label">TRANSAKSI</div>
-                    <li><a href="transaksi_baru.php">🛒 Pembelian</a></li>
+                    <li><a href="transaksi_baru.php">🛒 Penjualan</a></li>
                     <li><a href="pengadaan_list.php">📦 Pengadaan</a></li>
                     <li><a href="retur_list.php">🚚 Retur Barang</a></li>
                     
@@ -144,6 +144,7 @@ $db->close_connection();
                     <div class="menu-label">LAPORAN</div>
                     <li><a href="laporan_penjualan.php">📈 Laporan Penjualan</a></li>
                     <li><a href="riwayat_transaksi.php">📄 Riwayat Transaksi</a></li>
+                    <li><a href="laporan_kartu_stok.php">📄 Laporan Stok</a></li>
 
                 <?php 
 
@@ -153,7 +154,6 @@ $db->close_connection();
                     <div class="menu-label">TRANSAKSI</div>
                     <li><a href="transaksi_baru.php">🛒 Pembelian</a></li>
                     <li><a href="riwayat_transaksi.php">📄 Riwayat Transaksi</a></li>
-                    <li><a href="laporan_pribadi.php">📈 Laporan Saya</a></li>
 
                 <?php 
                 // MENU GUDANG 
@@ -168,7 +168,7 @@ $db->close_connection();
                 ?>
                     <div class="menu-label">TRANSAKSI</div>
                     <li><a href="transaksi_baru.php">🛒 Pembelian</a></li>
-                    
+                    <li><a href="riwayat_transaksi.php">📄 Riwayat Transaksi</a></li>
                 <?php endif; ?>
             </ul>
     </div>

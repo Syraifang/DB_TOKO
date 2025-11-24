@@ -9,7 +9,7 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['idrole'] != 1) {
 
 $db = new DbConnection();
 
-$query = "SELECT * FROM v_daftar_user ORDER BY iduser DESC";
+$query = "SELECT * FROM v_daftar_user ORDER BY iduser DESC"; // view
 $respon = $db->send_query($query);
 $data_user = $respon->data;
 ?>

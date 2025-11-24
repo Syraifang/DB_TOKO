@@ -9,7 +9,7 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['idrole'] != 1) {
 
 $db = new DbConnection();
 
-$query = "SELECT * FROM vendor ORDER BY idvendor DESC";
+$query = "SELECT * FROM v_vendor ORDER BY idvendor DESC"; // view
 $respon = $db->send_query($query);
 $data_vendor = $respon->data;
 ?>

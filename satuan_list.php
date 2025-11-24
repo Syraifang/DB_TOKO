@@ -10,7 +10,7 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['idrole'] != 1) {
 
 $db = new DbConnection();
 
-$query = "SELECT * FROM satuan ORDER BY idsatuan DESC";
+$query = "SELECT * FROM v_satuan ORDER BY idsatuan DESC"; // view
 $respon = $db->send_query($query);
 $data_satuan = $respon->data;
 ?>

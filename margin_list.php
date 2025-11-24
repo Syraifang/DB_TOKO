@@ -5,10 +5,7 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['idrole'] != 1) exit("Akses D
 
 $db = new DbConnection();
 
-$query = "SELECT m.*, u.username 
-          FROM margin_penjualan m 
-          JOIN user u ON m.iduser = u.iduser 
-          ORDER BY m.idmargin_penjualan DESC";
+$query = "SELECT * from v_margin ORDER BY idmargin_penjualan DESC"; // view 
 $respon = $db->send_query($query);
 $data_margin = $respon->data;
 ?>
@@ -50,8 +47,9 @@ $data_margin = $respon->data;
                 <tr>
                     <th>ID</th>
                     <th>Persentase Profit</th>
-                    <th>Dibuat Oleh</th>
-                    <th>Tanggal Dibuat</th>
+                    <th>Dibikin Oleh</th>
+                    <th>Dibuat Pada</th>
+                    <th>Diperbarui</th>
                     <th>Status</th>
                     <th>Aksi</th>
                 </tr>
@@ -63,6 +61,7 @@ $data_margin = $respon->data;
                 <td><strong><?php echo $row['persen']; ?>%</strong></td>
                 <td><?php echo htmlspecialchars($row['username']); ?></td>
                 <td><?php echo $row['created_at']; ?></td>
+                <td><?php echo $row['updated_at']; ?></td>
         
                 <td>
                     <?php if($row['status'] == 1): ?>
@@ -85,7 +84,7 @@ $data_margin = $respon->data;
 
                     <a href="margin_proses.php?aksi=hapus&id=<?php echo $row['idmargin_penjualan']; ?>" 
                     class="btn btn-delete" 
-                    onclick="return confirm('Yakin hapus permanen? \nJika margin ini sudah dipakai di penjualan, penghapusan akan GAGAL.')">Hapus</a>
+                    onclick="return confirm('Yakin hapus permanen? \nJika margin ini sudah dipakai di penjualan, penghapusan akan GAGAL')">Hapus</a>
                 </td>
                 </tr>
                 <?php endforeach; ?>

@@ -27,6 +27,7 @@
             <select name="idrole">
                 <option value="2">Kasir</option>
                 <option value="3">Staff Gudang</option>
+                <option value="4">Pembeli</option>
                 </select>
 
             <button type="submit">Daftar Sekarang</button>

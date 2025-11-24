@@ -8,7 +8,7 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['idrole'] != 1) {
 }
 
 $db = new DbConnection();
-$query = "SELECT * FROM role ORDER BY idrole ASC";
+$query = "SELECT * FROM v_daftar_role ORDER BY idrole ASC"; // View 1
 $respon = $db->send_query($query);
 $data_role = $respon->data;
 ?>

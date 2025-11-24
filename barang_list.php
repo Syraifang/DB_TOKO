@@ -9,10 +9,8 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['idrole'] != 1) {
 
 $db = new DbConnection();
 
-$query = "SELECT b.*, s.nama_satuan 
-          FROM barang b 
-          JOIN satuan s ON b.idsatuan = s.idsatuan 
-          ORDER BY b.idbarang DESC";
+$query = "SELECT * from v_barang 
+          ORDER BY b.idbarang DESC"; // view 2
 $respon = $db->send_query($query);
 $data_barang = $respon->data;
 ?>
@@ -55,7 +53,8 @@ $data_barang = $respon->data;
                     <th>ID</th>
                     <th>Nama Barang</th>
                     <th>Satuan</th>
-                    <th>Harga Modal</th>
+                    <th>Harga</th>
+                    <th>Jenis</th>
                     <th>Status</th>
                     <th>Aksi</th>
                 </tr>
@@ -67,6 +66,11 @@ $data_barang = $respon->data;
                     <td><?php echo htmlspecialchars($row['nama_barang']); ?></td>
                     <td><?php echo $row['nama_satuan']; ?></td>
                     <td>Rp <?php echo number_format($row['harga'], 0, ',', '.'); ?></td>
+                   <td> <?php if($row['jenis'] == "B"): ?>
+                            <span>Barang</span></td>
+                        <?php elseif($row['jenis'] == "M"): ?>
+                            <span>Makanan</span></td>
+                        <?php endif; ?>
                     
                     <td>
                         <?php if($row['status'] == 1): ?>

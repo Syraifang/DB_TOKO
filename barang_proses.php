@@ -10,7 +10,7 @@ if (isset($_GET['aksi']) && $_GET['aksi'] == 'toggle') {
     $status_baru = $_GET['status'];
 
     if ($status_baru == 0) {
-        $q = "CALL sp_hapus_barang_logis(?)";
+        $q = "CALL sp_hapus_barang_logis(?)"; // sp
         $db->send_secure_query($q, [$id], 'i');
     } else {
         $q = "UPDATE barang SET status = 1 WHERE idbarang = ?";

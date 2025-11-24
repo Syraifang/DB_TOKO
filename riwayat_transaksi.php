@@ -2,7 +2,7 @@
 session_start();
 require_once 'koneksi.php';
 
-if (!isset($_SESSION['is_logged_in']) || !in_array($_SESSION['idrole'], [1, 2])) {
+if (!isset($_SESSION['is_logged_in']) || !in_array($_SESSION['idrole'], [1, 2, 4])) {
     header("Location: login.php");
     exit;
 }
@@ -43,7 +43,7 @@ $data_transaksi = $respon->data;
                 <tr>
                     <th>No Nota</th>
                     <th>Tanggal & Jam</th>
-                    <th>Kasir</th>
+                    <th>User</th>
                     <th>Total Belanja</th>
                     <th>Aksi</th>
                 </tr>

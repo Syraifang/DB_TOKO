@@ -48,7 +48,7 @@ $data_laporan = $respon->data;
                     <tr>
                         <th>ID</th>
                         <th>Tanggal</th>
-                        <th>Kasir</th>
+                        <th>User</th>
                         <th>Barang</th>
                         <th>Harga</th>
                         <th>Qty</th>

@@ -2,7 +2,7 @@
 session_start();
 require_once 'koneksi.php';
 
-if (!isset($_SESSION['is_logged_in']) || !in_array($_SESSION['idrole'], [1, 2])) {
+if (!isset($_SESSION['is_logged_in']) || !in_array($_SESSION['idrole'], [1, 2, 4])) {
     header("Location: login.php");
     exit;
 }
@@ -15,27 +15,54 @@ if (!isset($_SESSION['keranjang'])) {
 
 if (isset($_POST['aksi']) && $_POST['aksi'] == 'tambah') {
     $idbarang = $_POST['idbarang'];
-    $jumlah = $_POST['jumlah'];
+    $jumlah_beli = $_POST['jumlah'];
 
+    $q_stok = "SELECT stok_terkini FROM v_stok_barang_terkini WHERE idbarang = ?"; // view barang
+    $res_stok = $db->send_secure_query($q_stok, [$idbarang], 'i');
+    $stok_gudang = 0;
+    
+    if ($res_stok->sukses && count($res_stok->data) > 0) {
+        $stok_gudang = $res_stok->data[0]['stok_terkini'];
+    }
+
+    $jumlah_di_keranjang = 0;
+    if (isset($_SESSION['keranjang'])) {
+        foreach ($_SESSION['keranjang'] as $item) {
+            if ($item['id'] == $idbarang) {
+                $jumlah_di_keranjang = $item['jumlah'];
+                break;
+            }
+        }
+    }
+
+    $total_diminta = $jumlah_beli + $jumlah_di_keranjang;
+
+    if ($total_diminta > $stok_gudang) {
+        echo "<script>
+            alert('GAGAL! Stok tidak cukup.\\n\\nSisa Stok: $stok_gudang\\nSudah di Keranjang: $jumlah_di_keranjang\\nAnda Minta: $jumlah_beli');
+            window.location='transaksi_baru.php';
+        </script>";
+        exit;
+    }
 
     $q = "SELECT * FROM v_daftar_barang WHERE idbarang = ?";
     $res = $db->send_secure_query($q, [$idbarang], 'i');
 
     if ($res->sukses && count($res->data) > 0) {
         $barang = $res->data[0];
-      
+        
         $item = [
             'id' => $barang['idbarang'],
             'nama' => $barang['nama_barang'],
-            'harga' => $barang['harga'], 
+            'harga' => $barang['harga'],
             'satuan' => $barang['nama_satuan'],
-            'jumlah' => $jumlah
+            'jumlah' => $jumlah_beli
         ];
         
         $found = false;
         foreach ($_SESSION['keranjang'] as $key => $val) {
             if ($val['id'] == $idbarang) {
-                $_SESSION['keranjang'][$key]['jumlah'] += $jumlah;
+                $_SESSION['keranjang'][$key]['jumlah'] += $jumlah_beli;
                 $found = true;
                 break;
             }
@@ -101,7 +128,7 @@ if ($res_margin->sukses && count($res_margin->data) > 0) {
 </head>
 <body>
 
-    <h1>🛒 Pembelian</h1>
+    <h1>🛒 Penjualan</h1>
     <a href="dashboard.php" style="text-decoration: none;">Kembali ke Dashboard</a>
     <br><br>
 
@@ -131,7 +158,7 @@ if ($res_margin->sukses && count($res_margin->data) > 0) {
                     <label>Jumlah</label>
                     <input type="number" name="jumlah" value="1" min="1" required>
                     
-                    <button type="submit" class="btn-add">+ Masukkan Keranjang</button>
+                    <button type="submit" class="btn-add">Masukkan Keranjang</button>
                 </form>
             <?php else: ?>
                 <div style="background: #f8d7da; padding: 10px; color: #721c24;">
@@ -217,7 +244,7 @@ if ($res_margin->sukses && count($res_margin->data) > 0) {
                     <input type="hidden" name="ppn" value="<?php echo $ppn; ?>">
                     <input type="hidden" name="total_nilai" value="<?php echo $total_bayar; ?>">
                     
-                    <button type="submit" class="btn-pay">💰 BAYAR SEKARANG</button>
+                    <button type="submit" class="btn-pay">💰 BAYAR</button>
                 </form>
                 
                 <br>

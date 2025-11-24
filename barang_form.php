@@ -17,7 +17,7 @@ if (isset($_GET['id'])) {
     $is_edit = true;
     $idbarang = $_GET['id'];
 
-    $q = "SELECT * FROM barang WHERE idbarang = ?";
+    $q = "SELECT * FROM v_barang WHERE idbarang = ?";
     $res = $db->send_secure_query($q, [$idbarang], 'i');
     if ($res->sukses && count($res->data) > 0) {
         $data = $res->data[0];
@@ -28,7 +28,7 @@ if (isset($_GET['id'])) {
     }
 }
 
-$q_satuan = "SELECT * FROM v_satuan_aktif";
+$q_satuan = "SELECT * FROM v_satuan_aktif"; // view 3
 $res_satuan = $db->send_query($q_satuan);
 $list_satuan = $res_satuan->data;
 ?>
@@ -58,7 +58,7 @@ $list_satuan = $res_satuan->data;
             <label>Jenis</label>
             <select name="jenis">
                 <option value="B" <?php if($jenis=='B') echo 'selected'; ?>>Barang</option>
-                <option value="J" <?php if($jenis=='J') echo 'selected'; ?>>Jasa</option>
+                <option value="M" <?php if($jenis=='M') echo 'selected'; ?>>Makanan</option>
             </select>
 
             <label>Satuan</label>
@@ -71,10 +71,10 @@ $list_satuan = $res_satuan->data;
                 <?php endforeach; ?>
             </select>
 
-            <label>Harga Modal</label>
+            <label>Harga</label>
             <input type="number" name="harga" value="<?php echo $harga; ?>" required>
 
-            <button type="submit">Simpan Data</button>
+            <button type="submit">Simpan</button>
         </form>
         <br>
         <a href="barang_list.php">Batal</a>
